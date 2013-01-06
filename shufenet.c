@@ -1,3 +1,12 @@
+/*
+*登陆和保持链接的程序
+*参数三个
+*第一个为用户名，如：xxxxxxx@shufe
+*第二个为密码
+*第三个为网卡名，默认eth0
+*用法：shufenet xxxxxx@xxxxxx（用户名） *******（密码） eth0（网卡名）
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
