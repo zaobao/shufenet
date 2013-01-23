@@ -63,7 +63,6 @@ shufenet
     https://github.com/zaobao/shufenet
 
 如果有任何问题，请发邮件至1205499934@shufe.com。
-
 ===============================================================================
 
 The Shufenet project is a 100% C 802.1x client for Unix/Linux only designed for Shanghai University of Finance and Economy's network.
@@ -77,7 +76,7 @@ Download all the files into one directory. Run install.sh with the root privileg
 
 RUNNING SHUFENET
 ================
-The directory you download files into is also the run directory.
+The directory you download files into is also the run directory when built from source.
 
 To login:
   sudo shufenet {username} {password} [devicename]
