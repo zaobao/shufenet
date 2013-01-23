@@ -1,0 +1,29 @@
+`cat $SHUFENET_HOME/sn.profile`
+
+start()
+{
+echo "start shufenet"
+$SHUFENET_HOME/shufenet $SN_ACCOUNT $SN_PASSWD $SN_ETHERNET &
+}
+
+stop()
+{
+$SHUFENET_HOME/eap_logoff
+pkill shufenet
+}
+
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+restart)
+stop
+start
+;;
+*)
+echo "usage: $0 start|stop|restart"
+exit 0;
+esac
