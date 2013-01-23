@@ -79,12 +79,15 @@ RUNNING SHUFENET
 The directory you download files into is also the run directory when built from source.
 
 To login:
+
   sudo shufenet {username} {password} [devicename]
 
 To logoff:
+
   sudo eap_logoff
   
 Or:
+
   sudo service shufenet start/stop/restart
 
 
