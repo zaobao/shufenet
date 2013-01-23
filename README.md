@@ -72,7 +72,7 @@ Shufenet is open source and is dual licensed using the BSD and GPL. You must abi
 
 BUILDING SHUFENET
 =================
-Download all the files into one directory. Run install.sh with the root privilege.
+Download all the files into one directory. Run install.sh with root privilege.
 
 RUNNING SHUFENET
 ================
@@ -87,8 +87,11 @@ To logoff:
   sudo eap_logoff
   
 Or:
-
+  
+  Edit sn.profile with root privilege to set username, password and network interface.
+  
   sudo service shufenet start/stop/restart
+  
 
 
 
