@@ -37,7 +37,6 @@ void get_loop(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * pa
 
 int main(int argc,char *argy[])
 {
-  int id;
 	uname = argy[1];
 	passwd = argy[2];
 	u_len = strlen(uname);
@@ -63,6 +62,7 @@ int main(int argc,char *argy[])
 	loop_identity();
 	pcap_close(handle);
 	libnet_destroy(l);
+	return 0;
 }
 
 void getid(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *packet)
@@ -82,7 +82,6 @@ void get_ok(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *packet)
 		printf("Failure");
 		exit(1);
 	}
-	libnet_ptag_t frame;
 	int len;
 	int pl_len;
 	u_int8_t enet_brdcst[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -99,7 +98,7 @@ void get_ok(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *packet)
 	memcpy(payload, head, 9);
 	memcpy(payload + 9, uname, u_len);
 	libnet_clear_packet(l);
-	frame = libnet_build_ethernet(
+	libnet_build_ethernet(
 		enet_brdcst,
 		enet_src,
 		(u_int16_t)0x0806,
@@ -113,9 +112,16 @@ void get_ok(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *packet)
 
 void start()
 {
-	libnet_ptag_t frame;
+	char *bpf_exp_head = "ether proto 0x888e and ether dst ";
 	u_int8_t payload[4] = {0x01, 0x01, 0x00, 0x00};
-	frame = libnet_build_ethernet(
+	u_int8_t mac_str[12];
+	u_int8_t bpf_exp[46] = {0};
+	sprintf((char * __restrict__)mac_str, "%02x%02x%02x%02x%02x%02x",
+					enet_src[0], enet_src[1], enet_src[2],
+					enet_src[3], enet_src[4], enet_src[5]);
+	memcpy(bpf_exp, bpf_exp_head, 33);
+	memcpy(bpf_exp+33, mac_str, 12);
+	libnet_build_ethernet(
 		enet_dst,
 		enet_src,
 		(u_int16_t)0x888e,
@@ -125,14 +131,13 @@ void start()
 		0
 	);
 	libnet_write (l);
-	pcap_compile(handle, &bp, "ether proto 0x888e and ether dst 0025b36bc05d", 0, 0);
+	pcap_compile(handle, &bp, (const char *)bpf_exp, 0, 0);
 	pcap_setfilter(handle, &bp);
 	pcap_loop(handle, 1, get_id_addr, NULL);
 }
 
 void identity()
 {
-	libnet_ptag_t frame;
 	int len;
 	int pl_len;
 	u_int8_t head[9] = {0x01,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x01};
@@ -148,7 +153,7 @@ void identity()
 	memcpy(payload, head, 9);
 	memcpy(payload + 9, uname, u_len);
 	libnet_clear_packet(l);
-	frame = libnet_build_ethernet(
+	libnet_build_ethernet(
 		enet_dst,
 		enet_src,
 		(u_int16_t)0x888e,
@@ -163,7 +168,6 @@ void identity()
 
 void allocated()
 {
-	libnet_ptag_t frame;
 	int len;
 	int pl_len;
 	u_int8_t head[10] = {0x01,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x07,0x0c};
@@ -181,7 +185,7 @@ void allocated()
 	memcpy(payload + 10, passwd, pw_len);
 	memcpy(payload + 10 + pw_len, uname, u_len);
 	libnet_clear_packet(l);
-	frame = libnet_build_ethernet(
+	libnet_build_ethernet(
 		enet_dst,
 		enet_src,
 		(u_int16_t)0x888e,
@@ -206,10 +210,10 @@ void get_loop(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * pa
 		exit(1);
 	} else if (packet[18] == 1 && packet[22] == 1) {
 		id = (int)(packet[19]);
-		libnet_ptag_t frame;
 		int len;
 		int pl_len;
-		u_int8_t head[9] = {0x01,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x01};
+		u_int8_t head[9] =
+				{0x01,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x01};
 		u_int8_t *payload;
 		len = 5 + u_len;
 		pl_len = 4 + len;
@@ -222,7 +226,7 @@ void get_loop(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * pa
 		memcpy(payload, head, 9);
 		memcpy(payload + 9, uname, u_len);
 		libnet_clear_packet(l);
-		frame = libnet_build_ethernet(
+		libnet_build_ethernet(
 			enet_dst,
 			enet_src,
 			(u_int16_t)0x888e,
